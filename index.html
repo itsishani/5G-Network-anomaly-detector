@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proactive Network Anomaly Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; color: #333; }
+        h1 { color: #007bff; text-align: center; }
+        .container { max-width: 900px; margin: 20px auto; background-color: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #anomalies-list { margin-top: 20px; }
+        .anomaly-card {
+            border: 1px solid #ff0000;
+            background-color: #ffebeb;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .anomaly-card h3 { color: #d9534f; margin-top: 0; }
+        .anomaly-card p { margin: 5px 0; }
+        .refresh-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .refresh-button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Proactive Network Anomaly Prediction</h1>
+        <p>This dashboard simulates the detection of highly localized network anomalies and suggests proactive interventions.</p>
+
+        <button class="refresh-button" onclick="fetchAnomalies()">Refresh Anomalies</button>
+
+        <h2>Recent Detected Anomalies (Last 2 Hours)</h2>
+        <div id="anomalies-list">
+            <p>Loading anomalies...</p>
+        </div>
+    </div>
+
+    <script>
+        async function fetchAnomalies() {
+            const response = await fetch('/anomalies');
+            const anomalies = await response.json();
+            const anomaliesListDiv = document.getElementById('anomalies-list');
+            anomaliesListDiv.innerHTML = ''; // Clear previous entries
+
+            if (anomalies.length === 0) {
+                anomaliesListDiv.innerHTML = '<p>No recent anomalies detected.</p>';
+            } else {
+                anomalies.forEach(anomaly => {
+                    const card = document.createElement('div');
+                    card.className = 'anomaly-card';
+                    card.innerHTML = `
+                        <h3>Anomaly Detected in ${anomaly.location_id} (${anomaly.network_type})</h3>
+                        <p><strong>Time:</strong> ${new Date(anomaly.timestamp).toLocaleString()}</p>
+                        <p><strong>Reason:</strong> ${anomaly.anomaly_reason}</p>
+                        <p><strong>Current Metrics:</strong> Signal: ${anomaly.signal_strength_dbm.toFixed(2)}dBm, Latency: ${anomaly.latency_ms.toFixed(2)}ms, Throughput: ${anomaly.throughput_mbps.toFixed(2)}Mbps, Packet Loss: ${anomaly.packet_loss_percent.toFixed(2)}%</p>
+                        <p><strong>Suggested Action:</strong> Initiate localized network diagnostics and dynamic resource allocation for this micro-area.</p>
+                    `;
+                    anomaliesListDiv.appendChild(card);
+                });
+            }
+        }
+
+        // Fetch anomalies on page load
+        window.onload = fetchAnomalies;
+        // Optionally, refresh every minute
+        setInterval(fetchAnomalies, 60000);
+    </script>
+</body>
+</html>
